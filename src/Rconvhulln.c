@@ -1,10 +1,11 @@
 /* Copyright (C) 2000 Kai Habel
-** Copyright R-version (c) 2005 Raoul Grasman 
-**                     (c) 2013 David Sterratt
+** Copyright R-version (C) 2005 Raoul Grasman 
+**                     (C) 2013-2015, 2017-2019 David Sterratt
+**                     (C) 2018 Pavlo Mozharovskyi
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
+** the Free Software Foundation; either version 3 of the License, or
 ** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
@@ -24,148 +25,146 @@
 
 23. May 2005 - Raoul Grasman: ported to R
 * Changed the interface for R
+
+02. February 2018 - Pavlo Mozharovskyi: added non-triangulated output
 */
 
 #include "Rgeometry.h"
-#define qh_QHimport
-#include "qhull_a.h"
-#include <unistd.h>              /* For unlink() */
 
-SEXP convhulln(const SEXP p, const SEXP options, const SEXP tmpdir)
+SEXP C_convhulln(const SEXP p, const SEXP options, const SEXP returnNonTriangulatedFacets, const SEXP tmpdir)
 {
-  SEXP retval, area, vol, retlist, retnames;
-  int curlong, totlong, i, j, retlen;
-  unsigned int dim, n;
-  int exitcode = 1; 
-  boolT ismalloc;
-  char flags[250];             /* option flags for qhull, see qh_opt.htm */
-  int *idx;
-  double *pt_array;
-
   /* Initialise return values */
-  area = vol = retlist = R_NilValue;
-  retlen = 1;
-  retval = R_NilValue;
+  SEXP retval, area, vol, normals, retlist, retnames;
+  retval = area = vol = normals = retlist = R_NilValue;
 
-  /* We cannot print directly to stdout in R, and the alternative of
-     using R_Outputfile does not seem to work for all
-     architectures. Setting outfile to NULL, is not an option, as an
-     open file handle is required for a call to freopen in the Qhull
-     code when qh_new_qhull() is called. Therefore use the ersatz
-     stdout, tmpstdout (see below). */
-  /* FILE *outfile = NULL; */
-   /* qh_fprintf() in userprint.c has been redefined so that a NULL
-      errfile results in printing via REprintf(). */
-  FILE *errfile = NULL;       
+  /* Run Qhull */
+  qhT *qh= (qhT*)malloc(sizeof(qhT));
+  char errstr1[100], errstr2[100];
+  unsigned int dim, n;
+  char cmd[50] = "qhull";
+  int exitcode = qhullNewQhull(qh, p, cmd,  options, tmpdir, &dim, &n, errstr1, errstr2);
 
-  if(!isString(options) || length(options) != 1){
-    error("Second argument must be a single string.");
-  }
-  if(!isMatrix(p) || !isReal(p)){
-    error("First argument should be a real matrix.");
-  }
-
-  /* Read options into command */
-	i = LENGTH(STRING_ELT(options,0)); 
-  if (i > 200) 
-    error("Option string too long");
-  sprintf(flags,"qhull %s", CHAR(STRING_ELT(options,0))); 
-  /* sprintf(flags,"qhull Qt Tcv %s",opts); // removed by Bobby */
-
-  /* Check input matrix */
-  dim = ncols(p);
-  n   = nrows(p);
-  if(dim <= 0 || n <= 0){
-    error("Invalid input matrix.");
-  }
-
-  j=0;
-  pt_array = (double *) R_alloc(n*dim, sizeof(double)); 
-  for(i=0; i < n; i++)
-    for(j=0; j < dim; j++)
-      pt_array[dim*i+j] = REAL(p)[i+n*j]; /* could have been pt_array = REAL(p) if p had been transposed */
-
-  ismalloc = False; /* True if qhull should free points in qh_freeqhull() or reallocation */
-
-  /* Jiggery-pokery to create and destroy the ersatz stdout, and the
-     call to qhull itself. */    
-  const char *name;
-  name = R_tmpnam("Rf", CHAR(STRING_ELT(tmpdir, 0)));
-  tmpstdout = fopen(name, "w");
-  exitcode = qh_new_qhull (dim,n,pt_array,ismalloc,flags,tmpstdout,errfile);
-  fclose(tmpstdout);
-  unlink(name);
-  free((char *) name); 
-
-
-  if (!exitcode) {  /* 0 if no error from qhull */
-
-    facetT *facet;              /* set by FORALLfacets */
-    vertexT *vertex, **vertexp; /* set by FORALLfacets */
-    unsigned int n = qh num_facets;
-
-    PROTECT(retval = allocMatrix(INTSXP, n, dim));
-    idx = (int *) R_alloc(n*dim,sizeof(int));
-
-    qh_vertexneighbors();
-
-    i=0;
-    FORALLfacets {
-      j=0;
-      /* qh_printfacet(stdout,facet); */
-      FOREACHvertex_ (facet->vertices) {
-        /* qh_printvertex(stdout,vertex); */
-        if (j >= dim)
-          warning("extra vertex %d of facet %d = %d",
-                  j++,i,1+qh_pointid(vertex->point));
-        else
-          idx[i+n*j++] = 1 + qh_pointid(vertex->point);
-      }
-      if (j < dim) warning("facet %d only has %d vertices",i,j);
-      i++;
-    }
-    j=0;
-    for(i=0;i<nrows(retval);i++)
-      for(j=0;j<ncols(retval);j++)
-        INTEGER(retval)[i+nrows(retval)*j] = idx[i+n*j];
-
-    /* Return area and volume */
-    if (qh totarea != 0.0) {
-      PROTECT(area = allocVector(REALSXP, 1));
-      REAL(area)[0] = qh totarea;
-      retlen++;
-    }
-    if (qh totvol != 0.0) {
-      PROTECT(vol = allocVector(REALSXP, 1));
-      REAL(vol)[0] = qh totvol;
-      retlen++;
-    }
-
-    /* Make a list if there is area or volume */
-    if(retlen > 1) {
-      PROTECT(retlist = allocVector(VECSXP, retlen));
-      PROTECT(retnames = allocVector(VECSXP, retlen));
-      retlen += 2;
-      SET_VECTOR_ELT(retlist, 0, retval);
-      SET_VECTOR_ELT(retnames, 0, mkChar("hull"));
-      SET_VECTOR_ELT(retlist, 1, area);
-      SET_VECTOR_ELT(retnames, 1, mkChar("area"));
-      SET_VECTOR_ELT(retlist, 2, vol);
-      SET_VECTOR_ELT(retnames, 2, mkChar("vol"));
-      setAttrib(retlist, R_NamesSymbol, retnames);
-    } else retlist = retval;
-
-    UNPROTECT(retlen);
-  }
-  qh_freeqhull(!qh_ALL);                /* free long memory */
-  qh_memfreeshort (&curlong, &totlong);	/* free short memory and memory allocator */
-
-  if (curlong || totlong) {
-    warning("convhulln: did not free %d bytes of long memory (%d pieces)",
-	    totlong, curlong);
-  }
+  /* Error handling */
   if (exitcode) {
-    error("Received error code %d from qhull.", exitcode);
+    freeQhull(qh);
+    error("Received error code %d from qhull. Qhull error:\n    %s    %s", exitcode, errstr1, errstr2);
   }
+  
+  /* Extract information from output */
+  int i, j, *idx;
+  facetT *facet;              /* set by FORALLfacets */
+  vertexT *vertex, **vertexp; /* set by FORALLfacets */
+  unsigned int nf = qh->num_facets;
+  unsigned int nVertexMax = 0;
+
+  /* If parameter (flag) returnNonTriangulatedFacets is set, count the
+     number of columns in the output matrix of vertices as the maximal
+     number of vertices in a facet, then allocate the matrix. */
+  if (INTEGER(returnNonTriangulatedFacets)[0] > 0){
+    i = 0;
+    FORALLfacets {
+      j = 0;
+      FOREACHvertex_ (facet->vertices) {
+        j++;
+      }
+      if (j > nVertexMax){
+        nVertexMax = j;
+      }
+    }
+  } else {
+    /* If parameter (flag) returnNonTriangulatedFacets is not set, the
+       number of columns equals dimension. */
+    nVertexMax = dim;
+  }
+  retval = PROTECT(allocMatrix(INTSXP, nf, nVertexMax));
+  idx = (int *) R_alloc(nf*nVertexMax,sizeof(int));
+
+  if (hasPrintOption(qh, qh_PRINTnormals)) {
+    normals = PROTECT(allocMatrix(REALSXP, nf, dim+1));
+  } else {
+    normals = PROTECT(R_NilValue);
+  }
+
+  qh_vertexneighbors(qh);
+
+  i = 0; /* Facet counter */
+  FORALLfacets {
+    j = 0;
+    /* qh_printfacet(stdout,facet); */
+    FOREACHvertex_ (facet->vertices) {
+      /* qh_printvertex(stdout,vertex); */
+      if (INTEGER(returnNonTriangulatedFacets)[0] == 0 && j >= dim)
+        warning("extra vertex %d of facet %d = %d",
+                j++, i, 1+qh_pointid(qh, vertex->point));
+      else
+        idx[i + nf*j++] = 1 + qh_pointid(qh, vertex->point);
+    }
+    if (j < dim) warning("facet %d only has %d vertices",i,j);
+    while (j < nVertexMax){
+      idx[i + nf*j++] = 0; /* Fill with zeros for the moment */
+    }
+
+    /* Output normals */
+    if (hasPrintOption(qh, qh_PRINTnormals)) {
+      if (facet->normal) {
+        for (j=0; j<dim; j++) {
+          REAL(normals)[i + nrows(normals)*j] = facet->normal[j];
+        }
+        REAL(normals)[i + nrows(normals)*dim] = facet->offset;
+      } else {
+        for (j=0; j<=dim; j++) {
+          REAL(normals)[i + nrows(normals)*j] = 0;
+        }
+      }
+    }
+    i++; /* Increment facet counter */
+  }
+  j = 0;
+  for(i = 0; i<nrows(retval); i++)
+    for(j = 0; j<ncols(retval); j++)
+      if (idx[i + nf*j] > 0){
+        INTEGER(retval)[i + nrows(retval)*j] = idx[i + nf*j];
+      } else {
+        INTEGER(retval)[i + nrows(retval)*j] = NA_INTEGER;
+      }
+
+  /* Return area and volume - will be there when option "FA" is provided */
+  if (qh->totarea != 0.0) {
+    area = PROTECT(allocVector(REALSXP, 1));
+    REAL(area)[0] = qh->totarea;
+  } else {
+    area = PROTECT(R_NilValue);
+  }
+  if (qh->totvol != 0.0) {
+    vol = PROTECT(allocVector(REALSXP, 1));
+    REAL(vol)[0] = qh->totvol;
+  } else {
+    vol = PROTECT(R_NilValue);
+  }
+
+  /* Set up output structure */
+  retlist =  PROTECT(allocVector(VECSXP, 4));
+  retnames = PROTECT(allocVector(VECSXP, 4));
+  SET_VECTOR_ELT(retlist,  0, retval);
+  SET_VECTOR_ELT(retnames, 0, mkChar("hull"));
+  SET_VECTOR_ELT(retlist,  1, area);
+  SET_VECTOR_ELT(retnames, 1, mkChar("area"));
+  SET_VECTOR_ELT(retlist,  2, vol);
+  SET_VECTOR_ELT(retnames, 2, mkChar("vol"));
+  SET_VECTOR_ELT(retlist,  3, normals);
+  SET_VECTOR_ELT(retnames, 3, mkChar("normals"));
+  setAttrib(retlist, R_NamesSymbol, retnames);
+
+  /* Register qhullFinalizer() for garbage collection and attach a
+     pointer to the hull as an attribute for future use. */
+  SEXP ptr, tag;
+  tag = PROTECT(allocVector(STRSXP, 1));
+  SET_STRING_ELT(tag, 0, mkChar("convhulln"));
+  ptr = PROTECT(R_MakeExternalPtr(qh, tag, R_NilValue));
+  R_RegisterCFinalizerEx(ptr, qhullFinalizer, TRUE);
+  setAttrib(retlist, tag, ptr);
+
+  UNPROTECT(8); /* ptr, tag, retnames, retlist, normals, vol, area, retval */
+
   return retlist;
 }

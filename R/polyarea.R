@@ -14,8 +14,8 @@
 ##' works along this dimension of the arrays \code{x} and \code{y}.
 ##'
 ##' @title Determines area of a polygon by triangle method. 
-##' @param x X coordinates of verticies.
-##' @param y Y coordinates of verticies.
+##' @param x X coordinates of vertices.
+##' @param y Y coordinates of vertices.
 ##' @param d Dimension of array to work along.
 ##' @return Area(s) of polygon(s).
 ##' @author David Sterratt based on the octave sources by David M. Doolin
@@ -26,8 +26,8 @@
 ##' y <- c(1, 3, 3, 1, 1)
 ##' polyarea(x, y)
 ##' polyarea(cbind(x, x), cbind(y, y)) ##  c(4, 4)
-##' polyarea(cbind(x, x), cbind(y,y), 1) ##  c(4, 4)
-##' polyarea(rbind(x, x), rbind(y,y), 2) ##  c(4, 4)
+##' polyarea(cbind(x, x), cbind(y, y), 1) ##  c(4, 4)
+##' polyarea(rbind(x, x), rbind(y, y), 2) ##  c(4, 4)
 polyarea <- function(x, y, d=1) {
   if (is.vector(x) & is.vector(y)) {
     if (length(x) == length(y)) {
@@ -51,13 +51,7 @@ polyarea <- function(x, y, d=1) {
       stop("x and y must be of same type")
     }
   }
+  names(a) <- NULL
   return(a)
 }
 
-## %!shared x, y
-## %! x = [1;1;3;3;1];
-## %! y = [1;3;3;1;1];
-## %!assert (polyarea(x,y), 4, eps)
-## %!assert (polyarea([x,x],[y,y]), [4,4], eps)
-## %!assert (polyarea([x,x],[y,y],1), [4,4], eps)
-## %!assert (polyarea([x,x]',[y,y]',2), [4;4], eps)
