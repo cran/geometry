@@ -6,11 +6,15 @@
 ##' lies outwith the hull or on one of its facets.
 ##' 
 ##' @param ch Convex hull produced using \code{\link{convhulln}}
-##' @param p An \eqn{M}-by-\eqn{N} matrix of points to test.
-##' The rows of \code{p} represent \eqn{M} points in \eqn{N}-dimensional space.
+##' @param p An \eqn{M}-by-\eqn{N} matrix of points to test. The rows
+##'   of \code{p} represent \eqn{M} points in \eqn{N}-dimensional
+##'   space.
 ##' @return A boolean vector with \eqn{M} elements
 ##' @author David Sterratt
-##' @seealso convhulln
+##' @note \code{inhulln} was introduced in geometry 0.4.0, and is
+##'   still under development. It is worth checking results for
+##'   unexpected behaviour.
+##' @seealso \code{\link{convhulln}}
 ##' @export
 ##' @examples
 ##' p <- cbind(c(-1, -1, 1), c(-1, 1, -1))
@@ -21,7 +25,7 @@
 ##'                   c(10  ,  0)))
 ##'
 ##' ## Test hypercube
-##' p <- rbox(4, B=1)
+##' p <- rbox(D=4, B=1)
 ##' ch <- convhulln(p)
 ##' tp <-  cbind(seq(-1.9, 1.9, by=0.2), 0, 0, 0)
 ##' pin <- inhulln(ch, tp)

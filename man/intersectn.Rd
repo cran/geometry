@@ -4,7 +4,7 @@
 \alias{intersectn}
 \title{Compute convex hull of intersection of two sets of points}
 \usage{
-intersectn(ps1, ps2, tol = 0, return.chs = TRUE)
+intersectn(ps1, ps2, tol = 0, return.chs = TRUE, options = "Tv")
 }
 \arguments{
 \item{ps1}{First set of points}
@@ -19,6 +19,9 @@ produces points very close together.}
 \item{return.chs}{If \code{TRUE} (default) return the convex hulls
 of the first and second sets of points, as well as the convex
 hull of the intersection.}
+
+\item{options}{Options passed to \code{\link{halfspacen}}. By
+default this is \code{Tv}.}
 }
 \value{
 List containing named elements: \code{ch1}, the convex
@@ -32,17 +35,23 @@ List containing named elements: \code{ch1}, the convex
 \description{
 Compute convex hull of intersection of two sets of points
 }
+\note{
+\code{intersectn} was introduced in geometry 0.4.0, and is
+  still under development. It is worth checking results for
+  unexpected behaviour.
+}
 \examples{
 # Two overlapping boxes
 ps1 <- rbox(0, C=0.5)
 ps2 <- rbox(0, C=0.5) + 0.5
 out <- intersectn(ps1, ps2)
-message(paste("Volume of 1st convex hull:", out$ch1$vol))
-message(paste("Volume of 2nd convex hull:", out$ch2$vol))
-message(paste("Volume of intersection convex hull:", out$ch$vol))
+message("Volume of 1st convex hull: ", out$ch1$vol)
+message("Volume of 2nd convex hull: ", out$ch2$vol)
+message("Volume of intersection convex hull: ", out$ch$vol)
 }
 \seealso{
-convhulln, halfspacen, inhulln
+\code{\link{convhulln}}, \code{\link{halfspacen}},
+  \code{\link{inhulln}}
 }
 \author{
 David Sterratt

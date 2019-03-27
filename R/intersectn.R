@@ -8,6 +8,8 @@
 ##' @param return.chs If \code{TRUE} (default) return the convex hulls
 ##'   of the first and second sets of points, as well as the convex
 ##'   hull of the intersection.
+##' @param options Options passed to \code{\link{halfspacen}}. By
+##'   default this is \code{Tv}.
 ##' @return List containing named elements: \code{ch1}, the convex
 ##'   hull of the first set of points, with volumes, areas and normals
 ##'   (see \code{\link{convhulln}}; \code{ch2}, the convex hull of the
@@ -21,12 +23,16 @@
 ##' ps1 <- rbox(0, C=0.5)
 ##' ps2 <- rbox(0, C=0.5) + 0.5
 ##' out <- intersectn(ps1, ps2)
-##' message(paste("Volume of 1st convex hull:", out$ch1$vol))
-##' message(paste("Volume of 2nd convex hull:", out$ch2$vol))
-##' message(paste("Volume of intersection convex hull:", out$ch$vol))
+##' message("Volume of 1st convex hull: ", out$ch1$vol)
+##' message("Volume of 2nd convex hull: ", out$ch2$vol)
+##' message("Volume of intersection convex hull: ", out$ch$vol)
 ##' @author David Sterratt
-##' @seealso convhulln, halfspacen, inhulln
-intersectn <- function(ps1, ps2, tol=0, return.chs=TRUE) {
+##' @note \code{intersectn} was introduced in geometry 0.4.0, and is
+##'   still under development. It is worth checking results for
+##'   unexpected behaviour.
+##' @seealso \code{\link{convhulln}}, \code{\link{halfspacen}},
+##'   \code{\link{inhulln}}
+intersectn <- function(ps1, ps2, tol=0, return.chs=TRUE, options="Tv") {
   distinct <-
     any(apply(ps1, 2, min) > apply(ps2, 2, max)) ||
     any(apply(ps1, 2, max) < apply(ps2, 2, min))
@@ -52,13 +58,18 @@ intersectn <- function(ps1, ps2, tol=0, return.chs=TRUE) {
   }
   
   ## Find intesections of halfspaces about feasible point. Catch error
-  ## when fixed point is not in intersection, due to precision issue.
-  ps <- tryCatch(halfspacen(rbind(ch1$normals, ch2$normals), fp),
+  ## (code QH6023) when fixed point is not in intersection, due to
+  ## precision issue.
+  ps <- tryCatch(halfspacen(rbind(ch1$normals, ch2$normals), fp, options=options),
                  error=function(e) {
                    if (grepl("QH6023", e$message)) {
                      return(NA)
                    }
-                   stop(e)
+                   errmess <- e$message
+                   if (!grepl("QJ", options)) {
+                     errmess <- paste(errmess, "\nTry calling intersectn with options=\"Tv QJ\"")
+                   }
+                   stop(errmess)
                  })
   if (all(is.na(ps)) || is.null(ps)) {
     if (return.chs) {
@@ -96,19 +107,30 @@ intersectn <- function(ps1, ps2, tol=0, return.chs=TRUE) {
 ##'   of both convex hulls
 ##' @export
 feasible.point <- function(ch1, ch2, tol=0) {
-  debug <- FALSE
-  N <- ncol(ch1$p)
-
+  N <- ncol(ch1$p)                      # Number of dimensions
+  M <- nrow(ch1$normals) + nrow(ch2$normals) # Total number of normals
+  
+  ## Find the point that bounds all points from below. Becuase
+  ## lpSolve::lp() implicitly gives solutions in the positive
+  ## quadrant, we need to subtract p0 from the search point, and then
+  ## add it to the optimised solution. This will ensure that solutions
+  ## not in the positive quadrant are found.
+  p0 <- apply(rbind(ch1$p, ch2$p), 2, min)
+  
   objective.in <- c(rep(0, N), 1)
-  const.mat <- round(rbind(cbind(ch1$normals[,-(N + 1)], 1),
-                           cbind(ch2$normals[,-(N + 1)], 1),
-                           c(rep(0, N), -1)), 6)
-  const.rhs <- -c(ch1$normals[,N + 1], ch2$normals[,N + 1], tol)
+  const.mat <- rbind(cbind(ch1$normals[,-(N + 1)], 1),
+                     cbind(ch2$normals[,-(N + 1)], 1),
+                     c(rep(0, N), -1))
+
+  ## p0 is incorporated into the matrix here
+  const.rhs <- -c(c(const.mat[1:M, 1:N] %*% cbind(p0) +
+                    c(ch1$normals[,N + 1], ch2$normals[,N + 1])),
+                  tol)
   const.dir <- c(rep("<", length(const.rhs)))
   
   opt <- lpSolve::lp(direction = "max", objective.in, const.mat, const.dir, const.rhs)
   if ((opt$status == 2) || (opt$solution[N+1] == 0)) return(NA)
-  return(opt$solution[1:N])
+  return(opt$solution[1:N] + p0)
 }
 
 ##' @method plot intersectn

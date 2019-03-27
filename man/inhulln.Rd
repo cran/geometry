@@ -9,8 +9,9 @@ inhulln(ch, p)
 \arguments{
 \item{ch}{Convex hull produced using \code{\link{convhulln}}}
 
-\item{p}{An \eqn{M}-by-\eqn{N} matrix of points to test.
-The rows of \code{p} represent \eqn{M} points in \eqn{N}-dimensional space.}
+\item{p}{An \eqn{M}-by-\eqn{N} matrix of points to test. The rows
+of \code{p} represent \eqn{M} points in \eqn{N}-dimensional
+space.}
 }
 \value{
 A boolean vector with \eqn{M} elements
@@ -21,6 +22,11 @@ boolean vector in which each element is \code{TRUE} if the
 corresponding point lies within the hull and \code{FALSE} if it
 lies outwith the hull or on one of its facets.
 }
+\note{
+\code{inhulln} was introduced in geometry 0.4.0, and is
+  still under development. It is worth checking results for
+  unexpected behaviour.
+}
 \examples{
 p <- cbind(c(-1, -1, 1), c(-1, 1, -1))
 ch <- convhulln(p)
@@ -30,7 +36,7 @@ inhulln(ch, rbind(c(-0.5, -0.5),
                   c(10  ,  0)))
 
 ## Test hypercube
-p <- rbox(4, B=1)
+p <- rbox(D=4, B=1)
 ch <- convhulln(p)
 tp <-  cbind(seq(-1.9, 1.9, by=0.2), 0, 0, 0)
 pin <- inhulln(ch, tp)
@@ -38,7 +44,7 @@ pin <- inhulln(ch, tp)
 pin == (tp[,1] < 1 & tp[,1] > -1)
 }
 \seealso{
-convhulln
+\code{\link{convhulln}}
 }
 \author{
 David Sterratt
