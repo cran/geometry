@@ -21,7 +21,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"C_delaunayn",           (DL_FUNC) &C_delaunayn,         3},
     {"C_halfspacen",          (DL_FUNC) &C_halfspacen,        3},
     {"C_inhulln",             (DL_FUNC) &C_inhulln,           2},
-    {"C_tsearch_orig",        (DL_FUNC) &C_tsearch_orig,      7},
+    {"C_tsearch_orig",        (DL_FUNC) &C_tsearch_orig,      6},
     {"C_tsearchn",            (DL_FUNC) &C_tsearchn,          2},
     {"_geometry_C_tsearch",   (DL_FUNC) &_geometry_C_tsearch, 7},
     {NULL, NULL, 0}

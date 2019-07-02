@@ -1,4 +1,4 @@
-f42ada3201b09dbbd187572bfa43fc04 *DESCRIPTION
+f97d52932123d47420fb2e9b0cd3bc28 *DESCRIPTION
 865ae507a8a8dd004407d99300443004 *NAMESPACE
 3557576b9e466df2e153857120997dc7 *NEWS
 d100f679b938110d96307291fce64c41 *R/RcppExports.R
@@ -35,7 +35,7 @@ c3beb671696970baf6c2ad4864fe156c *R/surf.tri.R
 a7bb2fd18c00c22ecdcf256621ce2670 *R/tetramesh.R
 0255bc872693f2a7d519c67bf89217b2 *R/trimesh.R
 d0a05bf107df68a7a13fdfc16f3ab4c1 *R/trisplinter.R
-207583a0516f05c424ea4db0032573d1 *R/tsearch.R
+90e2df012e612ba666f2aef0b7ee2891 *R/tsearch.R
 4d0c5f15fd95c7958932daad8013ff04 *build/vignette.rds
 29a536ff14c26f87f9db8a06086d57eb *demo/00Index
 2c2720d298e89a313a8963f5edc84fe6 *demo/intersectn.R
@@ -135,7 +135,7 @@ df5165902863c7128bf2b7a93a0965c8 *src/Rdelaunayn.c
 dacb518e4412655c3c27df15e33ae5ba *src/geom2_r.c
 76fcfbadd94c49fb50b0ef9b6d9e2ee8 *src/geom_r.c
 c90953c847606b82877c7fcefe6a083e *src/geom_r.h
-6c0953a3825a3669b026974b38bebb7a *src/geometry_init.c
+7dbadac011d4b76568b33bd5da4ac300 *src/geometry_init.c
 4605b60019d7afad1f3b3a0d4c94af84 *src/global_r.c
 5bf82d51319cea4e1f414e38c80b97f9 *src/io_r.c
 0796f7f714f6513afcfee3f96979e74e *src/io_r.h
