@@ -10,6 +10,17 @@
 ##'   hull of the intersection.
 ##' @param options Options passed to \code{\link{halfspacen}}. By
 ##'   default this is \code{Tv}.
+##' @param fp Coordinates of feasible point, i.e. a point known to lie
+##'   in the hulls of \code{ps1} and \code{ps2}. The feasible point is
+##'   required for \code{\link{halfspacen}} to find the intersection.
+##'   \code{intersectn} tries to find the feasible point automatically
+##'   using the linear program in \code{\link{feasible.point}}, but
+##'   currently the linear program fails on some examples where there
+##'   is an obvious solution. This option overrides the automatic
+##'   search for a feasible point
+##' @param autoscale \emph{Experimental in v0.4.2} Automatically scale
+##'   the points to lie in a sensible numeric range. May help to
+##'   correct some numerical issues.
 ##' @return List containing named elements: \code{ch1}, the convex
 ##'   hull of the first set of points, with volumes, areas and normals
 ##'   (see \code{\link{convhulln}}; \code{ch2}, the convex hull of the
@@ -31,8 +42,10 @@
 ##'   still under development. It is worth checking results for
 ##'   unexpected behaviour.
 ##' @seealso \code{\link{convhulln}}, \code{\link{halfspacen}},
-##'   \code{\link{inhulln}}
-intersectn <- function(ps1, ps2, tol=0, return.chs=TRUE, options="Tv") {
+##'   \code{\link{inhulln}}, \code{\link{feasible.point}}
+##' @importFrom utils packageDescription
+intersectn <- function(ps1, ps2, tol=0, return.chs=TRUE, options="Tv",
+                       fp=NULL, autoscale=FALSE) {
   distinct <-
     any(apply(ps1, 2, min) > apply(ps2, 2, max)) ||
     any(apply(ps1, 2, max) < apply(ps2, 2, min))
@@ -47,20 +60,51 @@ intersectn <- function(ps1, ps2, tol=0, return.chs=TRUE, options="Tv") {
   if (distinct) {
     return(list(ch1=ch1, ch2=ch2, ch=list(vol=0)))
   }
-  
-  ## Find feasible point in which points could overlap
-  fp <- feasible.point(ch1, ch2, tol=tol)
-  if (all(is.na(fp))) {
-    if (return.chs) {
-      return(list(ch1=ch1, ch2=ch2, ch=list(vol=0)))
+
+  ch1s <- ch1
+  ch2s <- ch2
+  if (autoscale) {
+    pmean <- colMeans(rbind(ps1, ps2))
+    ch1s <- convhulln(t(t(ps1) - pmean), "n FA")
+    ch2s <- convhulln(t(t(ps2) - pmean), "n FA")
+    if (!is.null(fp)) {
+      fp <- fp - pmean
     }
-    return(list(ch=list(vol=0)))
   }
   
-  ## Find intesections of halfspaces about feasible point. Catch error
+  ## Find feasible point in which points could overlap
+  if (is.null(fp)) {
+    fp <-tryCatch(feasible.point(ch1s, ch2s, tol=tol),
+                  error=function(e){
+                    stop("feasible.point() failed with error ",
+                         e$message, "\n",
+                         "If you can find a feasible point (i.e. point that lies in both hulls)\n",
+                         "for this input, supply this with the \"fp\" option.\n",
+                         "Otherwise, report bug, including inputs to intersectn() at\n",
+                         utils::packageDescription("geometry", fields="BugReports"), "\n",
+                         "or to ",
+                         utils::packageDescription("geometry", fields="Maintainer"))
+                  })
+    if (all(is.na(fp))) {
+      if (return.chs) {
+        return(list(ch1=ch1, ch2=ch2, ch=list(vol=0)))
+      }
+      return(list(ch=list(vol=0)))
+    }
+  } else {
+    ## fp supplied
+    if (!is.numeric(fp)) {
+      stop("fp should be numeric")
+    }
+    if (length(fp) != ncol(ps1)) {
+      stop("fp should have same dimension as ps1 and ps2")
+    }
+  }
+  
+  ## Find intersections of halfspaces about feasible point. Catch error
   ## (code QH6023) when fixed point is not in intersection, due to
   ## precision issue.
-  ps <- tryCatch(halfspacen(rbind(ch1$normals, ch2$normals), fp, options=options),
+  ps <- tryCatch(halfspacen(rbind(ch1s$normals, ch2s$normals), fp, options=options),
                  error=function(e) {
                    if (grepl("QH6023", e$message)) {
                      return(NA)
@@ -77,6 +121,10 @@ intersectn <- function(ps1, ps2, tol=0, return.chs=TRUE, options="Tv") {
     }
     return(list(ch=list(vol=0)))
   }
+
+  if (autoscale) {
+    ps <- t(t(ps) + pmean)
+  }
   
   ## Occasionally the halfspace creates points very close together. We
   ## can impose a tolerance to merge them
@@ -86,6 +134,23 @@ intersectn <- function(ps1, ps2, tol=0, return.chs=TRUE, options="Tv") {
   }
   ch <- convhulln(ps, "n FA")
 
+  ## Check for gross volume errors
+  if ((ch$vol > ch1$vol * (1 + 1E-4))) {
+    warning("Volume of final intersection hull is bigger than first of the original hulls\n",
+         "ch1 vol = ", ch1$vol, "\n",
+         "ch vol = ", ch$vol, "\n",
+         "Returning ch1")
+    ch <- ch1
+  }
+  if ((ch$vol > ch2$vol * (1 + 1E-4))) {
+    warning("Volume of final intersection hull is bigger than first of the original hulls\n",
+         "ch2 vol = ", ch2$vol, "\n",
+         "ch vol = ", ch$vol, "\n",
+         "Returning ch2")
+    ch <- ch2
+  }
+  
+  
   if (return.chs) {
     out <- list(ch1=ch1, ch2=ch2, ps=ps, ch=ch)
     class(out) <- "intersectn"
@@ -116,21 +181,91 @@ feasible.point <- function(ch1, ch2, tol=0) {
   ## add it to the optimised solution. This will ensure that solutions
   ## not in the positive quadrant are found.
   p0 <- apply(rbind(ch1$p, ch2$p), 2, min)
-  
   objective.in <- c(rep(0, N), 1)
   const.mat <- rbind(cbind(ch1$normals[,-(N + 1)], 1),
                      cbind(ch2$normals[,-(N + 1)], 1),
                      c(rep(0, N), -1))
 
   ## p0 is incorporated into the matrix here
-  const.rhs <- -c(c(const.mat[1:M, 1:N] %*% cbind(p0) +
-                    c(ch1$normals[,N + 1], ch2$normals[,N + 1])),
+  const.rhs <- -c(const.mat[1:M, 1:N] %*% cbind(p0) +
+                  c(ch1$normals[,N + 1], ch2$normals[,N + 1]),
                   tol)
   const.dir <- c(rep("<", length(const.rhs)))
-  
-  opt <- lpSolve::lp(direction = "max", objective.in, const.mat, const.dir, const.rhs)
-  if ((opt$status == 2) || (opt$solution[N+1] == 0)) return(NA)
-  return(opt$solution[1:N] + p0)
+
+  ## Scaling: The scale option of lpSolve::lp() determines options
+  ## used for scaling, and is crucial to avoid errors in some edge
+  ## cases. For list of options, see:
+  ## http://lpsolve.sourceforge.net/5.1/set_scaling.htm
+  ## http://lpsolve.sourceforge.net/5.1/scaling.htm
+  ## See also https://github.com/davidcsterratt/geometry/issues/35
+  ##
+  ## After testing on 10,000+ examples, it appears that to get
+  ## maxiumum coverage, in some cases multiple combinations of options
+  ## need to be tried. This code cycles through options, starting with
+  ## the combinations most likely to work.
+
+  ## DYNUPDATE == 0 may also work, but DYNUPDATE == 1 may work better
+  ## for some 4D examples
+  DYNUPDATE <- 1
+  ## Both options may help
+  for (POWER2 in 0:1) {
+    ## Both options may help
+    for (QUADRATIC in 0:1) {
+      ## 1 (SCALE_EXTREME) and 3 (SCALE_EXTREME) didn't work well in
+      ## tests
+      ##
+      ## 4 (SCALE_GEOMETRIC) on one example (included in tests) caused
+      ## some sort of infinite loop or race condition leading to the
+      ## process up 100%
+      ##
+      ## 2 (SCALE_RANGE) and 7 (SCALE_CURTISREID) seem to work OK for
+      ## most cases. SCALE_CURTISREID (with the 5.6.13 version of
+      ## lpSolve, at least) has caused some sort of infinite loop or
+      ## race condition leading to the process up 100% on 2 out of
+      ## millions of intersections computed on some processors, hence
+      ## it is put as the second option.
+      for (MAIN in c(2, 7)) {
+        ## Both options may help
+        for (LOGARITHMIC in 0:1) {
+          ## Equilibriate seemed to help for some cases, but caused a
+          ## crash in the example of inst/extdata
+          EQUILIBRIATE <- 0 
+          scale <-
+            MAIN +
+            QUADRATIC    *   8 +
+            LOGARITHMIC  *  16 +
+            POWER2       *  32 +
+            EQUILIBRIATE *  64 +
+            DYNUPDATE    * 256
+          opt <- lpSolve::lp(direction = "max",
+                             objective.in,
+                             const.mat,
+                             const.dir,
+                             const.rhs,
+                             scale=scale)
+          ## See http://lpsolve.sourceforge.net/5.5/solve.htm for status codes
+          ## Infeasible solution
+          if (opt$status == 2) return(NA)
+          ## Optimal
+          if (opt$status == 0) return(opt$solution[1:N] + p0)
+        }
+      }
+    }
+  }
+  ## Debugging output
+  if (!is.null(getOption("geometry.debug"))) {
+    opt <- linprog::writeMps("feasible-point.mps",
+                             cvec=objective.in,
+                             bvec=const.rhs,
+                             Amat=const.mat, "Feasible point")
+    writeLines(gsub("_ ", "_", readLines("feasible-point-tmp.mps")), "feasible-point.mps")
+    message("Debugging output saved to feasible-point.mps\n",
+            "Test on command line by running\n",
+            "  lp_solve -max -fmps feasible-point.mps")
+  }
+  stop("lpSolve::lp() returned error code ", opt$status, "\n",
+       "See http://lpsolve.sourceforge.net/5.5/solve.htm for explanation of errors.\n",
+       "Rescaling your problem may help")
 }
 
 ##' @method plot intersectn
