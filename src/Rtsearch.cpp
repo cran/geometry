@@ -58,7 +58,7 @@ bool PointInTriangle(Point p0, Point p1, Point p2, Point p, Point* bary, double 
 // [[Rcpp::export]]
 SEXP C_tsearch(NumericVector x,  NumericVector y, IntegerMatrix elem, NumericVector xi, NumericVector yi, bool bary = false, double eps = 1.0e-12)
 { 
-  QuadTree *tree = QuadTree::create(as< std::vector<double> >(xi),as< std::vector<double> >(yi));
+  QuadTree *tree = QuadTree::create(as< std::vector<double> >(xi),as< std::vector<double> >(yi), eps);
 
   int nelem = elem.nrow();
   int np = xi.size();
@@ -105,10 +105,10 @@ SEXP C_tsearch(NumericVector x,  NumericVector y, IntegerMatrix elem, NumericVec
     double rminy = min(A.y, B.y, C.y);
     double rmaxy = max(A.y, B.y, C.y);
 
-    double xcenter = (rminx + rmaxx)/2;
-    double ycenter = (rminy + rmaxy)/2;
-    double half_width = (rmaxx - rminx)/2;
-    double half_height = (rmaxy - rminy )/2;
+    double xcenter =     (rminx + rmaxx)/2;
+    double ycenter =     (rminy + rmaxy)/2;
+    double half_width =  (rmaxx - rminx)/2;
+    double half_height = (rmaxy - rminy)/2;
 
     // QuadTree search of points in enclosing boundingbox
 

@@ -19,22 +19,22 @@
 #include "qhull_ra.h"
 #include <unistd.h>              /* For unlink() */
 
-SEXP C_halfspacen(const SEXP p, const SEXP options, const SEXP tmpdir)
+SEXP C_halfspacen(const SEXP p, const SEXP options, const SEXP tmp_stdout, const SEXP tmp_stderr)
 {
   /* Return value*/
   SEXP retval;
 
   /* Run Qhull */
   qhT *qh= (qhT*)malloc(sizeof(qhT));
-  char errstr1[100], errstr2[100];
+  char errstr[ERRSTRSIZE];
   unsigned int dim, n;
   char cmd[50] = "qhull H";
-  int exitcode = qhullNewQhull(qh, p, cmd,  options, tmpdir, &dim, &n, errstr1, errstr2);
+  int exitcode = qhullNewQhull(qh, p, cmd,  options, tmp_stdout, tmp_stdout, &dim, &n, errstr);
 
   /* If error */
   if (exitcode) {
     freeQhull(qh);
-    error("Received error code %d from qhull. Qhull error:\n    %s    %s", exitcode, errstr1, errstr2);
+    error("Received error code %d from qhull. Qhull error:\n%s", exitcode, errstr);
   }
 
   if (!qh->feasible_point) {
