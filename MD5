@@ -1,6 +1,6 @@
-de88143e375cae14ce4d74d777581421 *DESCRIPTION
+b825e7204615ab2d4d2e6afdc97d1b00 *DESCRIPTION
 fed50c0e44e84203778acbfde6edd71a *NAMESPACE
-c649460edee5e5447c0ec0b17476f1de *NEWS
+26edb5b6afc2df36706af5b5c4d90a71 *NEWS
 d100f679b938110d96307291fce64c41 *R/RcppExports.R
 9c6b34a4cc5fd5384ff9576db63347e0 *R/Unique.R
 6676c6f07f0bcf0743181ad81a5b13bc *R/cart2pol.R
@@ -44,7 +44,7 @@ cbb93306cc667ac02ab9ca62bbca9e15 *inst/doc/LICENSE-NOTES
 088aa19a297b3d79bcd8af709b3cfac6 *inst/doc/MODIFIED.txt
 f28e77c4f4c4924bdaa68cb0f7c5639c *inst/doc/qhull-eg.R
 e4da12d940671662c95f27cc01da1ddb *inst/doc/qhull-eg.Rnw
-e7149ad5076925316d8824c2f38cc966 *inst/doc/qhull-eg.pdf
+3df2ef53b1b0e2dce4d394a9e2fa2f4e *inst/doc/qhull-eg.pdf
 7f91e2f84c11dd41a932b6d03a63ae3d *inst/doc/qhull/Announce.txt
 0c45b9e641ac0592e3eda32dac223b9a *inst/doc/qhull/COPYING.txt
 1ad9811271fd30b546ff4f5d3d0e4cc6 *inst/doc/qhull/File_id.diz
@@ -142,7 +142,7 @@ b142077766065048b5f6343851731de1 *src/Rtsearch.cpp
 dacb518e4412655c3c27df15e33ae5ba *src/geom2_r.c
 76fcfbadd94c49fb50b0ef9b6d9e2ee8 *src/geom_r.c
 c90953c847606b82877c7fcefe6a083e *src/geom_r.h
-a479589210d03473314f749ed330c8d2 *src/geometry_init.c
+023f4e70e66fe514f68d6a5ffab2201f *src/geometry_init.c
 4605b60019d7afad1f3b3a0d4c94af84 *src/global_r.c
 5bf82d51319cea4e1f414e38c80b97f9 *src/io_r.c
 0796f7f714f6513afcfee3f96979e74e *src/io_r.h
