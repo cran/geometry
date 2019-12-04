@@ -1,6 +1,6 @@
-b825e7204615ab2d4d2e6afdc97d1b00 *DESCRIPTION
+80191e8c3b6595a4a0654bfed3235265 *DESCRIPTION
 fed50c0e44e84203778acbfde6edd71a *NAMESPACE
-26edb5b6afc2df36706af5b5c4d90a71 *NEWS
+b829e141e6f0c8d74eb15e4c48ed6c6c *NEWS
 d100f679b938110d96307291fce64c41 *R/RcppExports.R
 9c6b34a4cc5fd5384ff9576db63347e0 *R/Unique.R
 6676c6f07f0bcf0743181ad81a5b13bc *R/cart2pol.R
@@ -44,7 +44,7 @@ cbb93306cc667ac02ab9ca62bbca9e15 *inst/doc/LICENSE-NOTES
 088aa19a297b3d79bcd8af709b3cfac6 *inst/doc/MODIFIED.txt
 f28e77c4f4c4924bdaa68cb0f7c5639c *inst/doc/qhull-eg.R
 e4da12d940671662c95f27cc01da1ddb *inst/doc/qhull-eg.Rnw
-3df2ef53b1b0e2dce4d394a9e2fa2f4e *inst/doc/qhull-eg.pdf
+ac95448b3048e419dd3afae452164afe *inst/doc/qhull-eg.pdf
 7f91e2f84c11dd41a932b6d03a63ae3d *inst/doc/qhull/Announce.txt
 0c45b9e641ac0592e3eda32dac223b9a *inst/doc/qhull/COPYING.txt
 1ad9811271fd30b546ff4f5d3d0e4cc6 *inst/doc/qhull/File_id.diz
@@ -126,14 +126,14 @@ b51abc8a985602501e0c3816b2218e0a *man/to.mesh3d.Rd
 fa42ae047747c7605cbe6e0298cde115 *man/trimesh.Rd
 8e2cbb2206ba988c4dde2298573ac198 *man/tsearch.Rd
 b61620430d94896c9caba6fc026c08e6 *man/tsearchn.Rd
-c34ebff061b008042f3c3d4c60f81fae *src/Makevars
+b31b497621bd7b1bd822e91f4a7b6d73 *src/Makevars
 9981fe6bd0995ae751dc31c2e5db9ec8 *src/QuadTree.cpp
 6e7a8219b074eed6919f14f8d6068e15 *src/QuadTree.h
 1d1e7e0ebca3232def50568b15ee836b *src/Rconvhulln.c
 3d06d039857c0410be2bde04f0bd30d7 *src/RcppExports.cpp
 19b8f52e6a759510a960b504856fc0d8 *src/Rdelaunayn.c
-f27ec8b9375394cb51b3793f009654ac *src/Rgeometry.c
-5a7f86b04282ccad34dc12c35105d804 *src/Rgeometry.h
+e8dfdfa01a16a662b52cbd54447c625e *src/Rgeometry.c
+8acf1c1bc44b83391141acfc86110efe *src/Rgeometry.h
 54e0d1a7309e67e0d830fa14ac454c64 *src/Rhalfspacen.c
 24d7e9d45718d70e5d36b7927a5077b5 *src/Rinhulln.c
 b142077766065048b5f6343851731de1 *src/Rtsearch.cpp
@@ -188,7 +188,6 @@ f281e943e2b03f9779a928d579d1c212 *tests/testthat/test-pol2cart.R
 3a847edb84b447e6cd7f6c52e141230e *tests/testthat/test-tsearchn.R
 cbb93306cc667ac02ab9ca62bbca9e15 *vignettes/LICENSE-NOTES
 088aa19a297b3d79bcd8af709b3cfac6 *vignettes/MODIFIED.txt
-0695e1c4d788c2354ec8c0e2c6fb9f79 *vignettes/auto/qhull-eg.el
 68a2cd14c4b008ba087a727ca09b5bc4 *vignettes/qhull-eg-002.pdf
 d58115b01fb59320488283b1e5bdca89 *vignettes/qhull-eg-004.pdf
 e4da12d940671662c95f27cc01da1ddb *vignettes/qhull-eg.Rnw
