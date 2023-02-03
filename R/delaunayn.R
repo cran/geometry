@@ -53,12 +53,15 @@
 ##'       each simplex (e.g. in 2D the areas of triangles; in 3D the volumes
 ##'       of tetrahedra). See \url{../doc/qhull/html/qh-optf.html#Fa}.}
 ##'     \item{\code{neighbours}}{If \code{TRUE} or if \code{Fn} is specified,
-##'       a list of  neighbours of each simplex.
+##'       a list of neighbours of each simplex. Note that a negative number
+##'       corresponds to "facet" (="edge" in 2D or "face" in 3D) that has no
+##'       neighbour, as will be the case for some simplices on the boundary
+##'       of the triangulation.
 ##'       See \url{../doc/qhull/html/qh-optf.html#Fn}}
 ##'   }
 ##'
 ##' @note This function interfaces the Qhull library and is a port
-##'   from Octave (\url{https://www.gnu.org/software/octave/}) to R. Qhull computes
+##'   from Octave (\url{https://octave.org/}) to R. Qhull computes
 ##'   convex hulls, Delaunay triangulations, halfspace intersections
 ##'   about a point, Voronoi diagrams, furthest-site Delaunay
 ##'   triangulations, and furthest-site Voronoi diagrams. It runs in
@@ -93,8 +96,8 @@
 ##'
 ##' # example tetramesh
 ##' \dontrun{
-##' rgl::rgl.viewpoint(60)
-##' rgl::rgl.light(120,60)
+##' rgl::view3d(60)
+##' rgl::light3d(120,60)
 ##' tetramesh(tc,pc, alpha=0.9)
 ##' }
 ##'
@@ -157,7 +160,39 @@ function(p, options=NULL, output.options=NULL, full=FALSE) {
   return(out)
 }
 
+##' @importFrom graphics plot
+##' @method plot delaunayn
+##' @export
+plot.delaunayn <- function(x, y, ...) {
+  if (ncol(x$p) < 2 || ncol(x$p) > 3)
+    stop("Only 2D and 3D convhullns can be plotted")
+  args <- list(...)
+  add <- FALSE
+  if ("add" %in% names(args)) {
+    add <- args$add
+    args$add <- NULL
+  }
+  if (ncol(x$p) == 2) {
+    if (!add) {
+      plot(x$p[,1], x$p[,2], ...)
+    }
+    m <- Unique(rbind(x$tri[,1:2],
+                      x$tri[,2:3],
+                      x$tri[,c(1,3)]))
+    p <- x$p
+    do.call(segments, c(list(p[m[,1],1],p[m[,1],2],p[m[,2],1],p[m[,2],2]),
+                        args))
+  }
+  if (ncol(x$p) == 3) {
+    do.call(tetramesh, c(list(x$tri, x$p),
+                         args))
+  }
+}
+
 ##  LocalWords:  param Qhull Fn delaunayn Qbb Qcc Qc Qz Qx QJ itemize
 ##  LocalWords:  tri Voronoi Quickhull distmesh Grasman Gramacy Kai
 ##  LocalWords:  Habel seealso interp convhulln Dobkin Huhdanpaa ACM
 ##  LocalWords:  dQuote emph dplot pc tc tetramesh dontrun useDynLib
+# LocalWords:  eqn url math tmp stdout tempfile stderr unlink NAs na
+# LocalWords:  tryCatch qhull grepl sapply attr importFrom convhullns
+# LocalWords:  args rbind

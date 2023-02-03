@@ -70,19 +70,19 @@ interfaces the \href{http://www.qhull.org}{Qhull} library.
 }
 \note{
 This function was originally a port of the
-  \href{https://octave.org}{Octave} convhulln function written
+  \href{https://octave.org/}{Octave} convhulln function written
   by Kai Habel.
 
 See further notes in \code{\link{delaunayn}}.
 }
 \examples{
 ## Points in a sphere
-ps <- matrix(rnorm(3000), ncol=3)  
+ps <- matrix(rnorm(3000), ncol=3)
 ps <- sqrt(3)*ps/drop(sqrt((ps^2) \%*\% rep(1, 3)))
 ts.surf <- t(convhulln(ps))  # see the qhull documentations for the options
 \dontrun{
-rgl.triangles(ps[ts.surf,1],ps[ts.surf,2],ps[ts.surf,3],col="blue",alpha=.2)
-for(i in 1:(8*360)) rgl.viewpoint(i/8)
+rgl::triangles3d(ps[ts.surf,1],ps[ts.surf,2],ps[ts.surf,3],col="blue",alpha=.2)
+for(i in 1:(8*360)) rgl::view3d(i/8)
 }
 
 ## Square

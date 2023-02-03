@@ -13,7 +13,7 @@ points in \eqn{N}-dimensional space.}
 \item{options}{String containing extra control options for the
   underlying Qhull command; see the Qhull documentation
   (\url{../doc/qhull/html/qdelaun.html}) for the available
-  options. 
+  options.
 
   The \code{Qbb} option is always passed to Qhull. The remaining
   default options are \code{Qcc Qc Qt Qz} for \eqn{N<4} and
@@ -57,8 +57,11 @@ If \code{output.options} is \code{NULL} (the default),
       each simplex (e.g. in 2D the areas of triangles; in 3D the volumes
       of tetrahedra). See \url{../doc/qhull/html/qh-optf.html#Fa}.}
     \item{\code{neighbours}}{If \code{TRUE} or if \code{Fn} is specified,
-      a list of  neighbours of each simplex.
-      See \url{../doc/qhull/html/qh-optf.html#Fn}} 
+      a list of neighbours of each simplex. Note that a negative number
+      corresponds to "facet" (="edge" in 2D or "face" in 3D) that has no
+      neighbour, as will be the case for some simplices on the boundary
+      of the triangulation.
+      See \url{../doc/qhull/html/qh-optf.html#Fn}}
   }
 }
 \description{
@@ -94,8 +97,8 @@ tc <- delaunayn(pc)
 
 # example tetramesh
 \dontrun{
-rgl::rgl.viewpoint(60)
-rgl::rgl.light(120,60)
+rgl::view3d(60)
+rgl::light3d(120,60)
 tetramesh(tc,pc, alpha=0.9)
 }
 
