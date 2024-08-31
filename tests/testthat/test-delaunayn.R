@@ -97,5 +97,46 @@ test_that("A square is triangulated", {
   expect_equal(delaunayn(square), rbind(c(4, 2, 1),
                                         c(4, 3, 1)),
                check.attributes=FALSE)
-  expect_error(delaunayn(square, "", "QH6239 Qhull precision error: Initial simplex is cocircular or cospherical"))
+  expect_error(delaunayn(square, ""), "QH6239 Qhull precision error: initial Delaunay input sites are cocircular or cospherical")
+})
+
+test_that("No regression on issue 11: All points in a box far from the origin are triangulated", {
+  ## Generate set of randomly generated points in a 40 unit square,
+  ## 250,000 from the origin
+  set.seed(2)
+  p <- geometry::rbox(4000, D=2, 20) + 250000
+
+  ## Triangulate
+  t <- delaunayn(p)
+
+  ## Count how many of the points aren't in the triangulation - should be zero
+  expect_equal(length(setdiff(seq(1,nrow(p)), unique(c(t[,1], t[,2], t[,3])))),
+               0)
+
+  ## Plotting: in the plot below, untriangulated points appear in red
+  ## Basted on Jean-Romain's example in https://github.com/davidcsterratt/geometry/issues/11
+  ## x <- p[,1]
+  ## y <- p[,2]
+  ## plot(x, y, cex = 0.1, col = "red")
+  ## trimesh(t, x, y, add = T)
+})
+
+test_that("No regression on issue 12: All points in a small box with different x and y distances to the origin are triangulated", {
+  ## Generate set of randomly generated points in a 40 unit square,
+  ## with x distance of 5E5 from the origin and y distance 5E6 from
+  ## the orgin. Note that the mean x and y values relative to the
+  ## width of the window are quite different to each other.
+  set.seed(2)
+  p <- geometry::rbox(4000, D=2, 20) + 5E5
+  p[,2] <- p[,2] + 5E6
+
+  ## Expect warnings without the correct options
+  expect_warning(delaunayn(p), "points missing from triangulation")
+  expect_warning(delaunayn(p, options="Qt Qc Qz Qbb"), "points missing from triangulation")
+  expect_warning(delaunayn(p, options="Qt Qc Qz QbB"), "points missing from triangulation")
+
+  ## Centring the points does allow triangulation
+  p.centred <- cbind(p[,1] - mean(p[,1]),
+                     p[,2] - mean(p[,2]))
+  delaunayn(p.centred)
 })
