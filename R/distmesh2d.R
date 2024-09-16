@@ -200,7 +200,7 @@ distmesh2d <- function(fd, fh, h0, bbox, p=NULL, pfix=array(0,dim=c(0,2)), ...,
     p = p + deltat*Ftot;
 
     #%7 excercise normal force at boundary: move overshoot points to nearest boundary point
-    d = fd(p);
+    d = fd(p, ...);
     ix= d > 0;                                                  # find points outside
     dgradx= (fd(cbind(p[ix, 1]+deps, p[ix, 2]),...) - d[ix])/deps;  # Numerical
     dgrady= (fd(cbind(p[ix, 1], p[ix, 2]+deps),...) - d[ix])/deps;  #    gradient
