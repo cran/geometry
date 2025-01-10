@@ -1,6 +1,6 @@
-db0a763c8fd726b4203cbbedfa444d16 *DESCRIPTION
+5f8fc64a6d7e858816989e445d53f466 *DESCRIPTION
 068b549a6e5e2c90a18f87356b4f00a4 *NAMESPACE
-f9871d9b5a078bcb80e712cf3a403afc *NEWS
+857a739d1004a411e2e44fa40d1ddb32 *NEWS
 d100f679b938110d96307291fce64c41 *R/RcppExports.R
 9c6b34a4cc5fd5384ff9576db63347e0 *R/Unique.R
 6676c6f07f0bcf0743181ad81a5b13bc *R/cart2pol.R
@@ -36,7 +36,7 @@ babfa6ca9e4b76b0353281b26426dfa0 *R/tetramesh.R
 0255bc872693f2a7d519c67bf89217b2 *R/trimesh.R
 d0a05bf107df68a7a13fdfc16f3ab4c1 *R/trisplinter.R
 bd79225e1f0911ec27614d244b9df7a3 *R/tsearch.R
-de4892f41a69fd256a21a85eb3f13075 *build/vignette.rds
+5bcde801b6cdd84aeb1d9fd51f5d2206 *build/vignette.rds
 29a536ff14c26f87f9db8a06086d57eb *demo/00Index
 2c2720d298e89a313a8963f5edc84fe6 *demo/intersectn.R
 3128acf4b0156e6c2b2d1e8ed9e3fcac *inst/WORDLIST
@@ -44,7 +44,7 @@ af3ca7a8ec4eb7c3808e7e4b0e7b9d20 *inst/doc/LICENSE-NOTES
 a17aa14b2581ee880ad40d5d1ad0c138 *inst/doc/MODIFIED.txt
 74b4f6b9894c15d5da15f00fb59bcedb *inst/doc/qhull-eg.R
 e4da12d940671662c95f27cc01da1ddb *inst/doc/qhull-eg.Rnw
-ce2999929a054c1bc0334646f56b3256 *inst/doc/qhull-eg.pdf
+f83220d9ced4ad51c10e9184f4e862fa *inst/doc/qhull-eg.pdf
 7f91e2f84c11dd41a932b6d03a63ae3d *inst/doc/qhull/Announce.txt
 0c45b9e641ac0592e3eda32dac223b9a *inst/doc/qhull/COPYING.txt
 1ad9811271fd30b546ff4f5d3d0e4cc6 *inst/doc/qhull/File_id.diz
@@ -144,11 +144,11 @@ eb79fb47cc16340b0e261d45c0cd5409 *src/Rinhulln.c
 b5bfc1b056f16945579951686dc2c428 *src/geom_r.c
 cfde24c128897c30273de690cfb8ad20 *src/geom_r.h
 023f4e70e66fe514f68d6a5ffab2201f *src/geometry_init.c
-1a7e91188890b5236d948d187e2363a9 *src/global_r.c
-580b19ed605ab74265254d47d020e14e *src/io_r.c
+37a6859600a9ea0f040ccf9e15a9ecc4 *src/global_r.c
+d04d6bb90395474fc978ce7cc6e13915 *src/io_r.c
 ebd7597c25e31f815e819da068e9914f *src/io_r.h
 b6910ea39f0797da7489f4421c9b88ea *src/libqhull_r.c
-c159399ed03809f06c240d31f274de7f *src/libqhull_r.h
+a14a634963717e60cba5b904939388d0 *src/libqhull_r.h
 8275d12edcabef504d1a39db3680bd09 *src/mem_r.c
 e7a552cf8e5b47a75b6b9fd0eaf0b4cf *src/mem_r.h
 746094f172d5e194a3b6c857a554e397 *src/merge_r.c
@@ -157,12 +157,12 @@ e7a552cf8e5b47a75b6b9fd0eaf0b4cf *src/mem_r.h
 f28a42b955f615484659d25f4d40bc72 *src/poly_r.c
 73b0c0b388910469d2faae58a39ebca6 *src/poly_r.h
 52fcd7e36336fd312c022fce2c45edf5 *src/qhull_ra.h
-5442309186618a5774230daaba3c74ab *src/qset_r.c
-47f8171b0fbe74280bb1299fd8a6ef8d *src/qset_r.h
+09c81cd16e87e5db473438003ccd848b *src/qset_r.c
+10c15020e692682c0a5dcbd0d78c2cc0 *src/qset_r.h
 f498e0602fba35e60a1080f3918b99c4 *src/random_r.c
 a1fe43bed99882c8c850ea6f0ae15ecd *src/random_r.h
 f38529b9bb49238666b5b7ab044e4b49 *src/rboxlib_r.c
-278521cfead70046b36b59b17bbaeb15 *src/stat_r.c
+f4651d79b4ad50819541cf9092f793f6 *src/stat_r.c
 ee0baf81125db01bf0bc29f4c2a3c33f *src/stat_r.h
 27987c9ca25ddb728b7de06abeffd039 *src/user_r.c
 560946c6d1a20ac71211e1d76f3b5f78 *src/user_r.h
