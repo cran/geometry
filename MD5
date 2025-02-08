@@ -1,6 +1,6 @@
-5f8fc64a6d7e858816989e445d53f466 *DESCRIPTION
+9087749cf71bc7122189ca675372b1d9 *DESCRIPTION
 068b549a6e5e2c90a18f87356b4f00a4 *NAMESPACE
-857a739d1004a411e2e44fa40d1ddb32 *NEWS
+eb31eec68df1b606d75f57adeb3ed912 *NEWS
 d100f679b938110d96307291fce64c41 *R/RcppExports.R
 9c6b34a4cc5fd5384ff9576db63347e0 *R/Unique.R
 6676c6f07f0bcf0743181ad81a5b13bc *R/cart2pol.R
@@ -44,7 +44,7 @@ af3ca7a8ec4eb7c3808e7e4b0e7b9d20 *inst/doc/LICENSE-NOTES
 a17aa14b2581ee880ad40d5d1ad0c138 *inst/doc/MODIFIED.txt
 74b4f6b9894c15d5da15f00fb59bcedb *inst/doc/qhull-eg.R
 e4da12d940671662c95f27cc01da1ddb *inst/doc/qhull-eg.Rnw
-f83220d9ced4ad51c10e9184f4e862fa *inst/doc/qhull-eg.pdf
+525f6d48677f96b423db7c9f29812cf8 *inst/doc/qhull-eg.pdf
 7f91e2f84c11dd41a932b6d03a63ae3d *inst/doc/qhull/Announce.txt
 0c45b9e641ac0592e3eda32dac223b9a *inst/doc/qhull/COPYING.txt
 1ad9811271fd30b546ff4f5d3d0e4cc6 *inst/doc/qhull/File_id.diz
@@ -150,7 +150,7 @@ ebd7597c25e31f815e819da068e9914f *src/io_r.h
 b6910ea39f0797da7489f4421c9b88ea *src/libqhull_r.c
 a14a634963717e60cba5b904939388d0 *src/libqhull_r.h
 8275d12edcabef504d1a39db3680bd09 *src/mem_r.c
-e7a552cf8e5b47a75b6b9fd0eaf0b4cf *src/mem_r.h
+61b477889f291ecfc36e9d4d3f9fa8d7 *src/mem_r.h
 746094f172d5e194a3b6c857a554e397 *src/merge_r.c
 905850f71545d3b4d2d3d0811035eb3d *src/merge_r.h
 3e5c51d6c3a002eb661060b51be47fef *src/poly2_r.c
